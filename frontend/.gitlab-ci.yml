@@ -1,0 +1,52 @@
+variables:
+  VERSION: 0.0.1
+  SONAR_FRONT_OPTS: "-Dsonar.projectKey=dby_key_front -Dsonar.sources=frontend/src -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONAR_PROJECT_KEY_FRONT}"
+
+build-frontend-code-job:
+  stage: build
+  only:
+    changes:
+      - frontend/**/*
+  script:
+    - cd frontend
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - frontend/dist/frontend
+
+sonarqube-frontend-sast:
+  stage: test
+  image: sonarsource/sonar-scanner-cli
+  script:
+    - sonar-scanner $SONAR_FRONT_OPTS
+  allow_failure: false
+
+upload-frontend-release:
+  stage: release
+  only:
+    changes:
+    - frontend/**/*
+  needs:
+    - build-frontend-code-job
+  script:
+    - cd frontend/dist
+    - tar czvf sausage-store-${VERSION}.tar.gz frontend
+    - >
+      curl -v -u "${NEXUS_REPO_USER}:${NEXUS_REPO_PASS}"
+      --upload-file sausage-store-${VERSION}.tar.gz
+      ${NEXUS_REPO_URL}/repository/${NEXUS_REPO_FRONTEND_NAME}/sausage-store-${VERSION}.tar.gz
+
+telegram-notification-frontend:
+  stage: notify
+  rules:
+    - changes:
+      - frontend/**/*
+    - if: '$CI_COMMIT_MESSAGE =~ /send notification/i'
+      when: always
+    - when: never
+  script:
+    - |
+      curl -s -X POST -H "Content-Type: application/json" \
+      -d '{"chat_id": "-1002426676593", "text": "✅ Быковский Д.В. Frontend успешно собран! Ссылка на артефакт: '$CI_PROJECT_URL'/-/jobs/artifacts/'$CI_COMMIT_SHA'/download?job=build-frontend-code-job"}' \
+      "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"

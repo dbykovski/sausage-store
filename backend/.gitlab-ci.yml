@@ -1,0 +1,57 @@
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .m2/repository/
+  policy: pull-push
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
+  SONAR_BACK_OPTS: "-Dsonar.projectKey=dby_key_back -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONAR_PROJECT_KEY_BACK} -Dsonar.qualitygate.wait=true"
+
+build-backend-code-job:
+  stage: build
+  only:
+    changes:
+      - backend/**/*
+  script:
+    - cd backend
+    - mvn package
+  artifacts:
+    paths:
+      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
+
+sonarqube-backend-sast:
+  stage: test
+  image: maven:3.8-openjdk-16
+  script:
+    - cd backend
+    - mvn verify sonar:sonar $SONAR_BACK_OPTS
+  allow_failure: false
+
+upload-backend-release:
+  stage: release
+  only:
+    changes:
+      - backend/**/*
+  needs:
+    - build-backend-code-job
+  script:
+    - cd backend
+    - >
+      mvn deploy -DskipTests
+      -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
+      -s settings.xml -Dversion.application=${VERSION}
+
+telegram-notification-backend:
+  stage: notify
+  rules:
+    - changes:
+      - backend/**/*
+    - if: '$CI_COMMIT_MESSAGE =~ /send notification/i'
+      when: always
+    - when: never
+  script:
+    - |
+      curl -s -X POST -H "Content-Type: application/json" \
+      -d '{"chat_id": "-1002426676593", "text": "✅ Быковский Д.В. Backend успешно собран! Ссылка на артефакт: '$CI_PROJECT_URL'/-/jobs/artifacts/'$CI_COMMIT_SHA'/download?job=build-backend-code-job"}' \
+      "https://api.telegram.org/bot5933756043:AAE8JLL5KIzgrNBeTP5e-1bkbJy4YRoeGjs/sendMessage"

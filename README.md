@@ -1,18 +1,36 @@
-5. Найдите способ обнаружить в системе исходный код скрипта, который выполняется, но был удалён.
+# Sausage Store
 
-Используя команду lsof, ищу удалённые файлы, которые еще остаются открытыми процессами.
+![image](https://user-images.githubusercontent.com/9394918/121517767-69db8a80-c9f8-11eb-835a-e98ca07fd995.png)
 
-sudo lsof | grep deleted
 
-none       733                           root  txt       REG                0,1     17032      26840 / (deleted)
-script.sh 1531                           root  255r      REG              252,2        64       4410 /opt/script.sh (deleted)
+## Technologies used
 
-PID 1531 , вывожу содержимое в окно терминала через файловый дескриптор
+* Frontend – TypeScript, Angular.
+* Backend  – Java 16, Spring Boot, Spring Data.
+* Database – H2.
 
-sudo cat /proc/1531/fd/255
+## Installation guide
+### Backend
 
-#!/bin/bash
-while true; do
-  date >> /opt/my.log
-  sleep 1
-done
+Install Java 16 and maven and run:
+
+```bash
+cd backend
+mvn package
+cd target
+java -jar sausage-store-0.0.1-SNAPSHOT.jar
+```
+
+### Frontend
+
+Install NodeJS and npm on your computer and run:
+
+```bash
+cd frontend
+npm install
+npm run build
+npm install -g http-server
+sudo http-server ./dist/frontend/ -p 80 --proxy http://localhost:8080
+```
+
+Then open your browser and go to [http://localhost](http://localhost)

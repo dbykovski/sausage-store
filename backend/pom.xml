@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.yandex.practicum.devops</groupId>
     <artifactId>sausage-store</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${version.application}</version>
     <name>sausage-store</name>
     <description>Backend for sausage-store</description>
     <properties>
@@ -22,6 +22,7 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.language>java</sonar.language>
         <jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+        <version.application>0.0.1-SNAPSHOT</version.application>
     </properties>
     <distributionManagement>
         <repository>

@@ -1,24 +1,31 @@
 cache:
-  key: ${CI_COMMIT_REF_SLUG}
   paths:
-    - .m2/repository/
-  policy: pull-push
+    - ${CI_PROJECT_DIR}/.m2/repository
 
 variables:
-  MAVEN_OPTS: "-Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository"
-  SONAR_BACK_OPTS: "-Dsonar.projectKey=dby_key_back -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONAR_PROJECT_KEY_BACK} -Dsonar.qualitygate.wait=true"
+   VERSION: 1.0.${CI_PIPELINE_ID}
+   MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
+   JAVA_OPTS: -XX:MaxRAMPercentage=90 # для того, чтобы Maven не съел всю свободную оперативку
+   SONAR_BACK_OPTS: "-Dsonar.projectKey=dby_key_back -Dsonar.host.url=${SONARQUBE_URL} -Dsonar.login=${SONAR_PROJECT_KEY_BACK} -Dsonar.qualitygate.wait=true"
 
-build-backend-code-job:
-  stage: build
-  only:
-    changes:
-      - backend/**/*
-  script:
-    - cd backend
-    - mvn package
-  artifacts:
-    paths:
-      - backend/target/sausage-store-0.0.1-SNAPSHOT.jar
+stages:
+   - build
+   - test
+   - release
+   - deploy
+   - notify
+
+build:
+   stage: build
+   script:
+      - cd backend
+      - >
+         mvn package
+         -Dversion.application=${VERSION}
+         -Dmaven.repo.local=${MAVEN_REPO_PATH}
+   rules: # rules и only в данных случаях взаимозаменяемы
+      - changes:
+         - backend/**/*
 
 sonarqube-backend-sast:
   stage: test
@@ -28,19 +35,37 @@ sonarqube-backend-sast:
     - mvn verify sonar:sonar $SONAR_BACK_OPTS
   allow_failure: false
 
-upload-backend-release:
-  stage: release
-  only:
-    changes:
-      - backend/**/*
-  needs:
-    - build-backend-code-job
-  script:
-    - cd backend
-    - >
-      mvn deploy -DskipTests
-      -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-      -s settings.xml -Dversion.application=${VERSION}
+release:
+   stage: release
+   script:
+      - cd backend
+      - >
+         mvn deploy -DskipTests -s settings.xml
+         -Dversion.application=${VERSION}
+         -Dmaven.repo.local=${MAVEN_REPO_PATH}
+   rules:
+      - changes:
+         - backend/**/*
+
+deploy:
+   stage: deploy
+   before_script:
+      #устанавливаем ssh-agent для удобства аутентификации по ssh
+      - 'command -v ssh-agent >/dev/null || ( apt-get update -y && apt-get install openssh-client -y )'
+      - eval $(ssh-agent -s)
+      #сохраняем сгенеренный ранее приватный ключ для раннера
+      - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+      - mkdir -p ~/.ssh
+      - chmod 600 ~/.ssh
+      - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
+      # Копируем файл сервиса на сервер
+   script:
+      #выполняем простую команду для проверки
+      - scp ./backend/sausage-store-backend.service ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/sausage-store-backend.service
+      - ssh ${DEV_USER}@${DEV_HOST} "export CURRENT_VERSION=${VERSION}; export VERSION=${VERSION}; export DEV_HOST=${DEV_HOST}; export NEXUS_REPO_URL=${NEXUS_REPO_URL}; export NEXUS_REPO_BACKEND_NAME=${NEXUS_REPO_BACKEND_NAME}; export NEXUS_REPO_USER=${NEXUS_REPO_USER}; export NEXUS_REPO_PASS=${NEXUS_REPO_PASS};setsid /bin/bash -s " < ./backend/deploy.sh
+   environment:
+      name: staging
+      url: http://std-ext-019-01.praktikum-services.tech/
 
 telegram-notification-backend:
   stage: notify

@@ -44,7 +44,7 @@ deploy-backend:
   stage: deploy
   image: vault:1.11.3
   before_script:
-    - apk add openssh-client bash gettext
+    - apk add openssh-client bash gettext jq
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -52,6 +52,7 @@ deploy-backend:
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
+    - - echo "$CI_JOB_JWT" | cut -d "." -f 2 | base64 -d -w0 | jq .
     - export VAULT_TOKEN="$(vault write -field=token auth/jwt/login role=sausage-store jwt=$CI_JOB_JWT)"
     - envsubst < ./backend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
 

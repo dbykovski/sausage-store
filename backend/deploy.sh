@@ -8,7 +8,7 @@ sudo docker run --rm -d --name sausage-backend \
      --env SPRING_DATASOURCE_USERNAME="${SPRING_DATASOURCE_USERNAME}" \
      --env SPRING_DATASOURCE_PASSWORD="${SPRING_DATASOURCE_PASSWORD}" \
      --env SPRING_DATA_MONGODB_URI="${SPRING_DATA_MONGODB_URI}" \
-     --env SPRING_CLOUD_VAULT_TOKEN="hvs.CAESIJRyaeMPqZPYzADF1qh1dk6TQsKx2IFzjpq3bmYET49NGh4KHGh2cy40UXE1Q05aY2lqRE9SZ2tmRTVNSm9oVW0" \
+     --env SPRING_CLOUD_VAULT_TOKEN="hvs.CAESIM-EdivWbuVMJ6U1IpswTthwoBGHd_mbt32_whhoeCA7Gh4KHGh2cy56WXNEcXhicTJ0dkhpbjhvT3pqb09sYkc" \
      --env SPRING_CLOUD_VAULT_SCHEME="http" \
      --env SPRING_CLOUD_VAULT_HOST="std-ext-019-01.praktikum-services.tech" \
      --env SPRING_CLOUD_VAULT_KV_ENABLED="true" \

@@ -1,0 +1,32 @@
+[Unit]
+Description=Sausage Store Backend Service
+After=network.target
+
+[Service]
+User=backend
+Group=backend
+
+WorkingDirectory=/opt/sausage-store
+
+Environment="REPORT_PATH=/var/sausage-store/reports"
+Environment="LOG_PATH=/var/sausage-store/logs"
+
+Environment=SPRING_DATASOURCE_URL=jdbc:postgresql://rc1d-78co8isdqitugh45.mdb.yandexcloud.net:6432/std-ext-019-01?sslmode=require
+Environment=SPRING_DATASOURCE_USERNAME=std-ext-019-01
+Environment=SPRING_DATASOURCE_PASSWORD=Testusr1234
+
+Environment=SPRING_DATA_MONGODB_URI=mongodb://std-ext-019-01:Testusr1234@rc1d-9f1992i4l77794td.mdb.yandexcloud.net:27018/std-ext-019-01?replicaSet=rs01&tls=true
+
+Restart=always
+
+ExecStart=/usr/bin/java \
+-Dmyserver.basePath='/opt/sausage-store/bin/' \
+-Dmyserver.bindAddr='127.0.0.1' \
+-Dmyserver.bindPort='8080' \
+-Dmyserver.hostName='Sausage-store' \
+-jar '/opt/sausage-store/bin/sausage-store.jar'
+
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

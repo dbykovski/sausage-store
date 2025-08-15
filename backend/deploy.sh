@@ -12,6 +12,6 @@ sudo docker run --rm -d --name sausage-backend \
      --env SPRING_CLOUD_VAULT_SCHEME="http" \
      --env SPRING_CLOUD_VAULT_HOST="std-ext-019-01.praktikum-services.tech" \
      --env SPRING_CLOUD_VAULT_KV_ENABLED="true" \
-     --env SPRING_CONFIG_IMPORT="vault://secret/sausage-store/" \
+     --env SPRING_CONFIG_IMPORT="vault://secret/sausage-store" \
      --network=sausage_network \
      "${CI_REGISTRY_IMAGE}"/sausage-backend:${VERSION}

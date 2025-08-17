@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   sausage-backend-blue:
     image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}

@@ -54,15 +54,12 @@ deploy-backend:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - envsubst < ./backend/docker-compose-backend.yml > docker-compose-temp.yml
-    - envsubst '${DEPLOY_COLOR} ${VERSION}' < ./backend/deploy-backend.sh > deploy-backend-temp.sh
+    - envsubst '${VERSION} ${DEPLOY_COLOR} ${CI_REGISTRY_USER} ${CI_REGISTRY_PASSWORD}' < ./backend/deploy-backend.sh > deploy-backend-temp.sh
     - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/bin"
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-backend.yml
-    - scp ./backend/opposite-color.sh ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/bin/
+    - scp ./backend/opposite-color.sh ${DEV_USER}@${DEV_HOST}:~/bin/
     - scp deploy-backend-temp.sh ${DEV_USER}@${DEV_HOST}:~/deploy-backend.sh
-    - ssh ${DEV_USER}@${DEV_HOST} "
-        chmod +x /home/${DEV_USER}/bin/opposite-color.sh ~/deploy-backend.sh &&
-        ~/deploy-backend.sh ${VERSION}
-      "
+    - ssh ${DEV_USER}@${DEV_HOST} "chmod +x ~/bin/opposite-color.sh ~/deploy-backend.sh && ~/deploy-backend.sh"
   after_script:
     - rm -f docker-compose-temp.yml deploy-backend-temp.sh
 

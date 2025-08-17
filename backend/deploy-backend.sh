@@ -1,7 +1,6 @@
 #! /bin/bash
 set -xe
 
-VERSION=$1
 DEPLOY_COLOR=${DEPLOY_COLOR:-blue}
 OPPOSITE_COLOR=$(~/bin/opposite-color.sh ${DEPLOY_COLOR})
 

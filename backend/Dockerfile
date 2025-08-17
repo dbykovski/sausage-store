@@ -9,6 +9,10 @@ RUN wget -O  YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-cert
 # шаг релиза
 FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
+VOLUME /app/reports
+VOLUME /app/logs
+RUN mkdir -p /app/reports && chown jaruser:jaruser /app/reports
+RUN mkdir -p /app/logs && chown jaruser:jaruser /app/logs
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
 RUN keytool -importcert -file YandexInternalRootCA.crt \

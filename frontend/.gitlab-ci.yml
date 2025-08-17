@@ -52,6 +52,7 @@ deploy-frontend:
     - chmod 644 ~/.ssh/known_hosts
   script:
     - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
+    - envsubst < ./frontend/deploy-frontend.sh > deploy-frontend-temp.sh
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
     - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/templates"
     - scp -r ./frontend/templates/ ${DEV_USER}@${DEV_HOST}:~/templates/

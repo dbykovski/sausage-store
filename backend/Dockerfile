@@ -19,7 +19,7 @@ RUN keytool -importcert -file YandexInternalRootCA.crt \
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 COPY .env /app/.env
-HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
     CMD curl -fSs http://localhost:8080/actuator/health || exit 1
 EXPOSE 8080
 USER jaruser

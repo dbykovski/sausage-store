@@ -53,9 +53,10 @@ deploy-frontend:
   script:
     - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
-    - scp -r ./frontend/templates/ ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/templates/
-    - ssh ${DEV_USER}@${DEV_HOST} "docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml pull && docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml up -d --force-recreate"
-    - ssh ${DEV_USER}@${DEV_HOST} "timeout 30 docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml ps --services --filter status=running | grep -q sausage-frontend"
+    - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/templates"
+    - scp -r ./frontend/templates/ ${DEV_USER}@${DEV_HOST}:~/templates/
+    - ssh ${DEV_USER}@${DEV_HOST} "docker compose -f ~/docker-compose-frontend.yml pull && docker compose -f ~/docker-compose-frontend.yml up -d --force-recreate"
+    - ssh ${DEV_USER}@${DEV_HOST} "timeout 30 docker compose -f ~/docker-compose-frontend.yml ps --services --filter status=running | grep -q sausage-frontend"
 
   after_script:
     - rm -f docker-compose-temp.yml

@@ -16,12 +16,14 @@ RUN mkdir -p /app/reports /app/logs /app \
 VOLUME /app/reports
 VOLUME /app/logs
 WORKDIR /app
-COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
-RUN keytool -importcert -file YandexInternalRootCA.crt \
-    -alias yandex -cacerts -storepass changeit -noprompt \
-    && rm -rf YandexInternalRootCA.crt \
-    && addgroup --system jaruser || true \
-    && adduser -S -s /bin/false -G jaruser jaruser -D -H || true
+COPY --from=builder /usr/src/app/YandexInternalRootCA.crt /tmp/YandexInternalRootCA.crt
+RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
+RUN keytool -importcert -trustcacerts -noprompt \
+    -alias yandex \
+    -file /tmp/YandexInternalRootCA.crt \
+    -keystore /usr/lib/jvm/liberica17-container-jre/lib/security/cacerts \
+    -storepass changeit \
+    && rm -f /tmp/YandexInternalRootCA.crt
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \

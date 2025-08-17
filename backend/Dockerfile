@@ -18,9 +18,10 @@ RUN keytool -importcert -file YandexInternalRootCA.crt \
     && adduser -S -s /bin/false -G jaruser jaruser -D -H
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
-HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+COPY .env /app/.env
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
     CMD curl -fSs http://localhost:8080/actuator/health || exit 1
 EXPOSE 8080
 USER jaruser
 ENTRYPOINT ["java", "-jar", "-Dmyserver.bindPort=8080", "/app/sausage-store.jar"]
-CMD ["--spring.profiles.active=default"]
+CMD ["sh", "-c", "export $(grep -v '^#' /app/.env | xargs) && java -Dlog4j2.formatMsgNoLookups=true -jar /app/sausage-store.jar --spring.profiles.active=default"]

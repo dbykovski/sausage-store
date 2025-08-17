@@ -50,6 +50,7 @@ deploy-frontend:
     - chmod 700 ~/.ssh
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - curl -I -u gitlab-ci-token:$CI_JOB_TOKEN "https://gitlab.praktikum-services.ru:5050/v2/std-ext-019-01/sausage-store/sausage-frontend/manifests/1.0.2319627"
   script:
     - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml

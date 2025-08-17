@@ -3,7 +3,7 @@ set -xe
 
 VERSION=$1
 DEPLOY_COLOR=${DEPLOY_COLOR:-blue}
-OPPOSITE_COLOR=$(opposite-color.sh ${DEPLOY_COLOR})
+OPPOSITE_COLOR=$(/home/${DEV_USER}/bin/opposite-color.sh ${DEPLOY_COLOR})
 
 sudo docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
 

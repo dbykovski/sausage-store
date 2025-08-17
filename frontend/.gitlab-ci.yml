@@ -43,7 +43,7 @@ deploy-frontend:
   stage: deploy
   image: alpine:3.18
   before_script:
-    - apk add openssh-client bash gettext
+    - apk add openssh-client bash gettext docker-cli
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -51,7 +51,22 @@ deploy-frontend:
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - envsubst < ./frontend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
+    - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
+    - scp -o BatchMode=yes \
+        docker-compose-temp.yml \
+        ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/docker-compose-frontend.yml
+    - rsync -az --delete -e "ssh -o BatchMode=yes" \
+        ./frontend/templates/ \
+        ${DEV_USER}@${DEV_HOST}:/home/${DEV_USER}/templates/
+    - ssh -o BatchMode=yes ${DEV_USER}@${DEV_HOST} "
+        docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml pull &&
+        docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml up -d --force-recreate
+      "
+    - ssh -o BatchMode=yes ${DEV_USER}@${DEV_HOST} "
+        timeout 30 docker compose -f /home/${DEV_USER}/docker-compose-frontend.yml ps --services --filter 'status=running' | grep -q sausage-frontend
+      "
+  after_script:
+    - rm -f docker-compose-temp.yml
 
 #telegram-notification-frontend:
 #  stage: notify

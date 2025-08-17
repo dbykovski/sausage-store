@@ -11,4 +11,4 @@ docker compose -f ~/docker-compose-backend.yml up -d \
   --scale sausage-backend-${OPPOSITE_COLOR}=0 \
   --scale sausage-backend-${DEPLOY_COLOR}=1
 
-timeout 10 bash -c 'until docker inspect -f {{.State.Health.Status}} sausage-backend-${DEPLOY_COLOR} | grep healthy; do sleep 5; done'
+timeout 300 bash -c 'until docker inspect -f {{.State.Health.Status}} sausage-backend-${DEPLOY_COLOR} | grep healthy; do sleep 5; done'

@@ -1,6 +1,6 @@
 services:
   sausage-backend-blue:
-    image: sausage-backend:${VERSION}
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
     container_name: sausage-backend-blue
     environment:
       - VIRTUAL_HOST=backend
@@ -21,7 +21,7 @@ services:
       start_period: 30s
 
   sausage-backend-green:
-    image: sausage-backend:${VERSION}
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
     container_name: sausage-backend-green
     environment:
       - VIRTUAL_HOST=backend

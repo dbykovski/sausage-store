@@ -1,6 +1,6 @@
 services:
   frontend:
-    image: sausage-frontend:${VERSION}
+    image: ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
     container_name: sausage-frontend
     ports:
       - "80:80"

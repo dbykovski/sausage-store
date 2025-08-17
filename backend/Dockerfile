@@ -1,4 +1,4 @@
-FROM maven:3.9.3-eclipse-temurin-20-alpine as builder
+FROM maven:3.9.3-eclipse-temurin-17-alpine as builder
 ARG VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY ./src ./src
@@ -9,15 +9,10 @@ RUN wget -O  YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-cert
 # шаг релиза
 FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
-RUN if ! getent group jaruser >/dev/null; then \
-      addgroup --system jaruser; \
-    fi && \
-    if ! getent passwd jaruser >/dev/null; then \
-      adduser -S -s /bin/false -G jaruser jaruser -D -H; \
-    fi
-RUN mkdir -p /app/reports && \
-    mkdir -p /app/logs && \
-    chown -R jaruser:jaruser /app
+RUN addgroup -S jaruser || true \
+ && adduser -S -s /bin/false -G jaruser jaruser || true
+RUN mkdir -p /app/reports /app/logs /app \
+ && chown -R jaruser:jaruser /app
 VOLUME /app/reports
 VOLUME /app/logs
 WORKDIR /app

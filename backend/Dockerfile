@@ -20,8 +20,8 @@ COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
 RUN keytool -importcert -file YandexInternalRootCA.crt \
     -alias yandex -cacerts -storepass changeit -noprompt \
     && rm -rf YandexInternalRootCA.crt \
-    && addgroup --system jaruser \
-    && adduser -S -s /bin/false -G jaruser jaruser -D -H
+    && addgroup --system jaruser || true \
+    && adduser -S -s /bin/false -G jaruser jaruser -D -H || true
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \

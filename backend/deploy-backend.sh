@@ -4,9 +4,13 @@ set -xe
 DEPLOY_COLOR=${DEPLOY_COLOR:-blue}
 OPPOSITE_COLOR=$(~/bin/opposite-color.sh ${DEPLOY_COLOR})
 
+# Проверка доступности Registry с использованием токена
+curl -H "Authorization: Bearer $CI_JOB_TOKEN" \
+  "https://gitlab.praktikum-services.ru:5050/v2/"
+
 sudo docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
 
-docker compose -f /home/${DEV_USER}/docker-compose-backend.yml up -d \
+docker compose -f ~/docker-compose-backend.yml up -d \
   --scale sausage-backend-${OPPOSITE_COLOR}=0 \
   --scale sausage-backend-${DEPLOY_COLOR}=1
 

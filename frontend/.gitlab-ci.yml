@@ -54,7 +54,7 @@ deploy-frontend:
     - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
     - envsubst < ./frontend/deploy-frontend.sh > deploy-frontend-temp.sh
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
-    - scp deploy-frontend.sh ${DEV_USER}@${DEV_HOST}:~/deploy-frontend.sh
+    - scp deploy-frontend-temp.sh ${DEV_USER}@${DEV_HOST}:~/deploy-frontend.sh
     - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/templates"
     - scp -r ./frontend/templates/ ${DEV_USER}@${DEV_HOST}:~/templates/
     - ssh ${DEV_USER}@${DEV_HOST} ~/deploy-frontend.sh

@@ -3,17 +3,18 @@ ARG VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY ./src ./src
 COPY *.xml ./
-RUN wget -O YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-certs/CA.pem \
+RUN wget -O  YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-certs/CA.pem \
     && mvn package -Dversion.application=${VERSION} -Dmaven.test.skip=true
 
-FROM eclipse-temurin:17-jre-jammy
+FROM bellsoft/liberica-runtime-container:jre-17-slim-musl
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .
 RUN keytool -importcert -file YandexInternalRootCA.crt \
     -alias yandex -cacerts -storepass changeit -noprompt \
-    && rm -f YandexInternalRootCA.crt
-RUN groupadd -r jaruser && useradd -r -s /bin/false -g jaruser jaruser
+    && rm -rf YandexInternalRootCA.crt \
+    && addgroup --system jaruser \
+    && adduser -S -s /bin/false -G jaruser jaruser -D -H
 COPY --chown=jaruser:jaruser \
      --from=builder /usr/src/app/target/sausage-store-${VERSION}.jar ./sausage-store.jar
 EXPOSE 8080

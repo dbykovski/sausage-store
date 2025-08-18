@@ -11,7 +11,7 @@ touch init.sql
 
 # Очистим базу
 echo "DROP TABLE IF EXISTS flyway_schema_history;" >> init.sql
-echo "DROP TABLE IF EXISTS products;" >> init.sql
+echo "DROP TABLE IF EXISTS product;" >> init.sql
 echo "DROP TABLE IF EXISTS orders;" >> init.sql
 echo "DROP TABLE IF EXISTS order_product;" >> init.sql
 

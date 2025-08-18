@@ -6,7 +6,7 @@ COPY *.xml ./
 RUN wget -O YandexInternalRootCA.crt https://storage.yandexcloud.net/cloud-certs/CA.pem \
     && mvn package -Dversion.application=${VERSION} -Dmaven.test.skip=true
 
-    FROM eclipse-temurin:17-jre-jammy
+FROM eclipse-temurin:17-jre-jammy
 ARG VERSION=${VERSION}
 WORKDIR /app
 COPY --from=builder /usr/src/app/YandexInternalRootCA.crt .

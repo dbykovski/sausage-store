@@ -58,9 +58,6 @@ if is_running "${CNAME}"; then
   docker rm -f "${CNAME}" || true
 fi
 
-echo "[i] Pulling image for ${SERVICE}-${target}..."
-docker compose -f "$COMPOSE_FILE" pull "${SERVICE}-${target}"
-
 echo "[i] Starting ${SERVICE}-${target}..."
 docker compose -f "$COMPOSE_FILE" up -d "${SERVICE}-${target}"
 

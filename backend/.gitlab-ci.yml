@@ -56,7 +56,10 @@ deploy-backend:
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-backend.yml
     - scp ./backend/blue-green.sh ${DEV_USER}@${DEV_HOST}:~/blue-green.sh
     - ssh ${DEV_USER}@${DEV_HOST} "chmod +x ~/blue-green.sh"
-    - envsubst  < ./backend/deploy-backend.sh|ssh ${DEV_USER}@${DEV_HOST}
+    - envsubst  < ./backend/deploy-backend.sh > deploy-backend-temp.sh
+    - scp deploy-backend-temp.sh ${DEV_USER}@${DEV_HOST}:~/deploy-backend.sh
+    - ssh ${DEV_USER}@${DEV_HOST} "chmod +x ~/deploy-backend.sh
+    - ssh ${DEV_USER}@${DEV_HOST} "~/deploy-backend.sh"
 
 #telegram-notification-backend:
 #  stage: notify

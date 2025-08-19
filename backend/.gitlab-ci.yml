@@ -52,6 +52,8 @@ deploy-backend:
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts    
   script:
+    - envsubst < ../docker-compose.yml > docker-compose-temp.yml
+    - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose.yml
     - envsubst  < ./backend/deploy-backend.sh|ssh ${DEV_USER}@${DEV_HOST}
 
 #telegram-notification-backend:

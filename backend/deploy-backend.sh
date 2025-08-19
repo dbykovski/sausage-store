@@ -10,4 +10,4 @@ fi
 sudo docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
 sudo docker pull ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
 
-docker --context remote compose -f docker-compose-backend-blue.yml up backend -d --force-recreate
+docker --context remote compose -f docker-compose-backend.yml up backend -d --force-recreate

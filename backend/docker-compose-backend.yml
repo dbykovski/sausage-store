@@ -4,13 +4,6 @@ services:
     container_name: sausage-backend-blue
     environment:
       - VIRTUAL_HOST=backend
-      - SPRING_PROFILES_ACTIVE=blue
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
-      - REPORT_PATH=${REPORT_PATH}
-      - LOG_PATH=${LOG_PATH}
     networks:
       - sausage_network
     ports:
@@ -27,13 +20,6 @@ services:
     container_name: sausage-backend-green
     environment:
       - VIRTUAL_HOST=backend
-      - SPRING_PROFILES_ACTIVE=green
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
-      - REPORT_PATH=${REPORT_PATH}
-      - LOG_PATH=${LOG_PATH}
     networks:
       - sausage_network
     deploy:

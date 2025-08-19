@@ -1,6 +1,13 @@
 #! /bin/bash
 set -xe
+
+if ! docker context inspect remote >/dev/null 2>&1; then
+  docker context create remote \
+    --description 'remote ssh' \
+    --docker host=ssh://student@std-ext-019-01.praktikum-services.tech
+fi
+
 sudo docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
 sudo docker pull ${CI_REGISTRY_IMAGE}/sausage-frontend:${VERSION}
-docker compose -f ~/docker-compose-frontend.yml up -d --force-recreate
-timeout 300 bash -c 'until docker inspect -f {{.State.Health.Status}} sausage-backend-blue | grep healthy || docker inspect -f {{.State.Health.Status}} sausage-backend-green | grep healthy; do sleep 5; done' || exit 1
+
+docker --context remote compose -f docker-compose-frontend.yml up frontend -d --pull "always" --force-recreate

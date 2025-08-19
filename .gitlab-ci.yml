@@ -22,11 +22,11 @@ backend:
       - backend/**/*
 
 backend-report:
- stage: module-pipelines
- trigger:
- include:
- - local: /backend-report/.gitlab-ci.yml
- strategy: depend
- only:
- changes:
- - backend-report/**/*
+  stage: module-pipelines
+  trigger:
+    include:
+      - local: /backend-report/.gitlab-ci.yml
+    strategy: depend
+  only:
+    changes:
+      - backend-report/**/*

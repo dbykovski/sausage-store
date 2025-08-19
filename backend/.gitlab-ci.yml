@@ -42,7 +42,7 @@ release:
 #
 deploy-backend:
   stage: deploy
-  image: docker:24.0.7-alpine3.19
+  image: alpine:3.18
   before_script:
     - apk add openssh-client bash gettext docker-cli-compose
     - eval $(ssh-agent -s)
@@ -50,16 +50,9 @@ deploy-backend:
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
-    - chmod 644 ~/.ssh/known_hosts
-    - docker context create remote --description "remote ssh" --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
+    - chmod 644 ~/.ssh/known_hosts    
   script:
-    - echo "SPRING_DATASOURCE_URL=${PSQL_DATASOURCE}" >> deploy.env
-    - echo "SPRING_DATASOURCE_USERNAME=${PSQL_USER}" >> deploy.env
-    - echo "SPRING_DATASOURCE_PASSWORD=${PSQL_PASSWORD}" >> deploy.env
-    - echo "REPORTS_MONGODB_URI="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true"" >> deploy.env
-    - echo "REPORT_PATH=/var/www-data/htdocs" >> deploy.env
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - docker --context remote compose --env-file deploy.env up backend -d --pull "always" --force-recreate
+    - envsubst  < ./backend/deploy-backend.sh|ssh ${DEV_USER}@${DEV_HOST}
 
 #telegram-notification-backend:
 #  stage: notify

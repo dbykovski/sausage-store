@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ${CI_REGISTRY_IMAGE}/std-ext-019-01/sausage-store/backend:${VERSION}
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend:${VERSION}
     container_name: sausage-store-backend
     environment:
       # Переменные из application.properties можно заменить переменными окружения

@@ -54,6 +54,8 @@ deploy-backend:
   script:
     - envsubst < "$CI_PROJECT_DIR/docker-compose.yml" > docker-compose-temp.yml
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-backend.yml
+    - scp ./backend/blue-green.sh ${DEV_USER}@${DEV_HOST}:~/blue-green.sh
+    - ssh ${DEV_USER}@${DEV_HOST} "chmod +x ~/blue-green.sh"
     - envsubst  < ./backend/deploy-backend.sh|ssh ${DEV_USER}@${DEV_HOST}
 
 #telegram-notification-backend:

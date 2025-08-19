@@ -66,4 +66,4 @@ deploy-backend-report:
 
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY || true
     - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}" || true
-    - docker --context remote compose --env-file deploy.env up backendreport -d --pull "always" --force-recreate
+    - docker --context remote compose --env-file deploy.env up backend-report -d --pull "always" --force-recreate

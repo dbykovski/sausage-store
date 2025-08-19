@@ -1,24 +1,5 @@
 services:
-  backend-blue:
-    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/sausage-backend:${VERSION}
-    container_name: sausage-store-backend
-    environment:
-      # Переменные из application.properties можно заменить переменными окружения
-      - SPRING_PROFILES_ACTIVE=blue
-      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
-      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
-      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
-      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
-      interval: 10s
-      timeout: 3s
-      retries: 10
-      start_period: 15s
-    networks:
-      - sausage-store
-  backend-green:
+  backend:
     image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/sausage-backend:${VERSION}
     container_name: sausage-store-backend
     environment:

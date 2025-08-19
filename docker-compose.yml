@@ -16,14 +16,14 @@ services:
     build:
       context: backend-report
       dockerfile: Dockerfile
-    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend-report:${BACKEND_REPORT_VERSION}
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend-report:${VERSION}
     container_name: sausage-store-backend-report
     environment:
       SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
     networks:
       - sausage-store
   frontend:
-    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/frontend:${FRONTEND_VERSION}
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/frontend:${VERSION}
     container_name: sausage-store-frontend
     ports:
       - "80:80"

@@ -1,13 +1,14 @@
 services:
   backend:
-    image: ${CI_REGISTRY_IMAGE}/std-ext-019-01/sausage-store/backend:${BACKEND_VERSION}
+    image: ${CI_REGISTRY_IMAGE}/std-ext-019-01/sausage-store/backend:${VERSION}
     container_name: sausage-store-backend
     environment:
       # Переменные из application.properties можно заменить переменными окружения
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DATABASE}
-      SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
+      - SPRING_PROFILES_ACTIVE=blue
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
     restart: always
     networks:
       - sausage-store

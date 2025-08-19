@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   backend:
     image: ${CI_REGISTRY_IMAGE}/std-ext-019-01/sausage-store/backend:${BACKEND_VERSION}
@@ -10,18 +8,19 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_DATASOURCE_URL: jdbc:postgresql://${SPRING_DATASOURCE_HOST}:${SPRING_DATASOURCE_PORT}/${SPRING_DATASOURCE_DATABASE}
       SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
+    restart: always
     networks:
       - sausage-store
-#  backend-report:
-#    build:
-#      context: backend-report
-#      dockerfile: Dockerfile
-#    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend-report:${BACKEND_REPORT_VERSION}
-#    container_name: sausage-store-backend-report
-#    environment:
-#      SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
-#    networks:
-#      - sausage-store
+  backend-report:
+    build:
+      context: backend-report
+      dockerfile: Dockerfile
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend-report:${BACKEND_REPORT_VERSION}
+    container_name: sausage-store-backend-report
+    environment:
+      SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
+    networks:
+      - sausage-store
   frontend:
     image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/frontend:${FRONTEND_VERSION}
     container_name: sausage-store-frontend

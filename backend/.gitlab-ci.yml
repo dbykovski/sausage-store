@@ -6,8 +6,7 @@ variables:
   VERSION: 1.0.${CI_PIPELINE_ID}
   MAVEN_REPO_PATH: ${CI_PROJECT_DIR}/.m2/repository
   JAVA_OPTS: -XX:MaxRAMPercentage=90
-  DEPLOY_COLOR: "blue"
-
+  
 stages:
   - build
   - release
@@ -52,15 +51,15 @@ deploy-backend:
     - chmod 700 ~/.ssh
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - docker context create remote --description "remote ssh" --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    - envsubst < ./backend/docker-compose-backend.yml > docker-compose-temp.yml
-    - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-backend.yml
-    - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/bin"
-    - scp ./backend/opposite-color.sh ${DEV_USER}@${DEV_HOST}:~/bin/    
-    - ssh ${DEV_USER}@${DEV_HOST} "chmod +x ~/bin/opposite-color.sh"
-    - envsubst '$DEV_USER $CI_REGISTRY_USER $CI_REGISTRY_PASSWORD $CI_REGISTRY $DEPLOY_COLOR $CI_REGISTRY_IMAGE $VERSION' < ./backend/deploy-backend.sh|ssh ${DEV_USER}@${DEV_HOST}
-  after_script:
-    - rm -f docker-compose-temp.yml deploy-backend-temp.sh
+    - echo "SPRING_DATASOURCE_URL=${PSQL_DATASOURCE}" >> deploy.env
+    - echo "SPRING_DATASOURCE_USERNAME=${PSQL_USER}" >> deploy.env
+    - echo "SPRING_DATASOURCE_PASSWORD=${PSQL_PASSWORD}" >> deploy.env
+    - echo "REPORTS_MONGODB_URI="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true"" >> deploy.env
+    - echo "REPORT_PATH=/var/www-data/htdocs" >> deploy.env
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker --context remote compose --env-file deploy.env up backend -d --pull "always" --force-recreate
 
 #telegram-notification-backend:
 #  stage: notify

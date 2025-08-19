@@ -56,10 +56,14 @@ deploy-backend-report:
     - mkdir -p ~/.ssh && chmod 700 ~/.ssh
     - ssh-keyscan -H ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - docker context create remote --description "remote ssh" --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
 
   script:
+    - echo "VERSION=${VERSION}" >> deploy.env
+    - echo "PORT=8080" >> deploy.env
+    - echo "REPORT_PATH=/var/www-data/htdocs" >> deploy.env
+    - echo "REPORTS_MONGODB_URI="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true"" >> deploy.env
+
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY || true
     - docker context create remote --docker "host=ssh://${DEV_USER}@${DEV_HOST}" || true
-    - docker --context remote compose -f <(envsubst < docker-compose.yml) up -d --build --remove-orphans backend-report
-    - docker context use default
-    - docker context rm remote || true
+    - docker --context remote compose --env-file deploy.env up backendreport -d --pull "always" --force-recreate

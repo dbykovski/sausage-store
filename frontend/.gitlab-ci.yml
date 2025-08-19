@@ -50,14 +50,13 @@ deploy-frontend:
     - chmod 700 ~/.ssh
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
+    - docker context create remote --description "remote ssh" --docker "host=ssh://${DEV_USER}@${DEV_HOST}"
   script:
-    - envsubst < ./frontend/docker-compose-frontend.yml > docker-compose-temp.yml
-    - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
-    - ssh ${DEV_USER}@${DEV_HOST} "mkdir -p ~/templates"
-    - scp -r ./frontend/templates/ ${DEV_USER}@${DEV_HOST}:~/templates/
-    - envsubst < ./frontend/deploy-frontend.sh|ssh ${DEV_USER}@${DEV_HOST}
-  after_script:
-    - rm -f docker-compose-temp.yml
+    - echo "VERSION=${VERSION}" >> deploy.env
+    - echo "REPORTS_MONGODB_URI="mongodb://${MONGO_USER}:${MONGO_PASSWORD}@${MONGO_HOST}:27018/${MONGO_DATABASE}?tls=true"" >> deploy.env
+    - echo "REPORT_PATH=/var/www-data/htdocs" >> deploy.env
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker --context remote compose --env-file deploy.env up frontend -d --pull "always" --force-recreate
 
 #telegram-notification-frontend:
 #  stage: notify

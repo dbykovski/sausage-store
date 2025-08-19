@@ -53,7 +53,7 @@ deploy-frontend:
   script:
     - envsubst < "$CI_PROJECT_DIR/docker-compose.yml" > docker-compose-temp.yml
     - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
-    - envsubst  < ./backend/deploy-frontend.sh|ssh ${DEV_USER}@${DEV_HOST}
+    - envsubst  < ./frontend/deploy-frontend.sh|ssh ${DEV_USER}@${DEV_HOST}
 
 #telegram-notification-frontend:
 #  stage: notify

@@ -1,0 +1,59 @@
+services:
+  backend-blue:
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/sausage-backend:${VERSION}
+    container_name: sausage-store-backend
+    environment:
+      # Переменные из application.properties можно заменить переменными окружения
+      - SPRING_PROFILES_ACTIVE=blue
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - sausage-store
+  backend-green:
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/sausage-backend:${VERSION}
+    container_name: sausage-store-backend
+    environment:
+      # Переменные из application.properties можно заменить переменными окружения
+      - SPRING_PROFILES_ACTIVE=blue
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+    networks:
+      - sausage-store
+  backend-report:
+    build:
+      context: backend-report
+      dockerfile: Dockerfile
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/backend-report:${VERSION}
+    container_name: sausage-store-backend-report
+    environment:
+      SPRING_DATA_MONGODB_URI: ${REPORTS_MONGODB_URI}
+    networks:
+      - sausage-store
+  frontend:
+    image: gitlab.praktikum-services.ru:5050/std-ext-019-01/sausage-store/sausage-frontend:${VERSION}
+    container_name: sausage-store-frontend
+    ports:
+      - "80:80"
+    networks:
+      - sausage-store
+
+networks:
+  sausage-store:

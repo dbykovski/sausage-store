@@ -43,7 +43,7 @@ deploy-frontend:
   stage: deploy
   image: alpine:3.18
   before_script:
-    - apk add openssh-client bash gettext
+    - apk add openssh-client bash gettext docker-cli curl docker-cli-compose
     - eval $(ssh-agent -s)
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
     - mkdir -p ~/.ssh
@@ -51,7 +51,9 @@ deploy-frontend:
     - ssh-keyscan ${DEV_HOST} >> ~/.ssh/known_hosts
     - chmod 644 ~/.ssh/known_hosts
   script:
-    - envsubst < ./frontend/deploy.sh|ssh ${DEV_USER}@${DEV_HOST}
+    - envsubst < "$CI_PROJECT_DIR/docker-compose.yml" > docker-compose-temp.yml
+    - scp docker-compose-temp.yml ${DEV_USER}@${DEV_HOST}:~/docker-compose-frontend.yml
+    - envsubst  < ./frontend/deploy-frontend.sh|ssh ${DEV_USER}@${DEV_HOST}
 
 #telegram-notification-frontend:
 #  stage: notify

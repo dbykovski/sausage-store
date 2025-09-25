@@ -1,6 +1,6 @@
 # Start from the latest golang base image
 FROM golang:latest as builder
-
+RUN apk add --no-cache ca-certificates curl
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
@@ -17,7 +17,8 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 
 # Get Yandex Cloud Certificate Authority
-RUN curl https://storage.yandexcloud.net/cloud-certs/CA.pem -o YandexInternalRootCA.crt
+RUN curl -fsSL https://storage.yandexcloud.net/cloud-certs/CA.pem \
+    -o /usr/local/share/ca-certificates/yandex_cloud_ca.crt
 
 
 ######## Start a new stage from scratch #######
@@ -28,7 +29,8 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 # Copy Yandex Cloud Certificate Authority
-COPY --from=builder /app/YandexInternalRootCA.crt .
+COPY --from=builder /usr/local/share/ca-certificates/yandex_cloud_ca.crt /usr/local/share/ca-certificates/yandex_cloud_ca.crt
+RUN update-ca-certificates
 
 # Copy the Pre-built binary file from the previous stage
 COPY --from=builder /app/main .

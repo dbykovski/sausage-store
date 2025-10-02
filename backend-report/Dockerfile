@@ -1,6 +1,7 @@
 # Start from the latest golang base image
-FROM golang:latest as builder
+FROM golang:1.22-alpine3.20 AS builder
 RUN apk add --no-cache ca-certificates curl
+
 # Set the Current Working Directory inside the container
 WORKDIR /app
 

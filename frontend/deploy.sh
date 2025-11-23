@@ -1,9 +1,8 @@
 #! /bin/bash
+#Если свалится одна из команд, рухнет и весь скрипт
 set -xe
-sudo docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
-sudo docker network create -d bridge sausage_network || true
-sudo docker rm -f sausage-frontend || true
-sudo docker run -d --restart=on-failure:10 --name sausage-frontend \
-     --network=sausage_network \
-     -p 80:80 \
-     "${CI_REGISTRY_IMAGE}"/sausage-frontend:${VERSION}
+sudo rm -rf /var/www-data/*||true
+#Переносим артефакт в нужную папку
+curl -u ${NEXUS_REPO_USER}:${NEXUS_REPO_PASS} -o sausage-store-frontend.tar.gz ${NEXUS_REPO_URL}/repository/${NEXUS_REPO_FRONTEND_NAME}/${VERSION}/sausage-store-${VERSION}.tar.gz
+sudo tar -xzf sausage-store-frontend.tar.gz -C /var/www-data/ && sudo chown -R frontend:frontend /var/www-data/frontend||true
+sudo systemctl reload nginx

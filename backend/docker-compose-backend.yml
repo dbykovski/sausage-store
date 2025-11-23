@@ -1,0 +1,45 @@
+services:
+  sausage-backend-blue:
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
+    container_name: sausage-backend-blue
+    environment:
+      - VIRTUAL_HOST=backend
+    networks:
+      - sausage_network
+    ports:
+      - "8081:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+
+  sausage-backend-green:
+    image: ${CI_REGISTRY_IMAGE}/sausage-backend:${VERSION}
+    container_name: sausage-backend-green
+    environment:
+      - VIRTUAL_HOST=backend
+      - SPRING_PROFILES_ACTIVE=green
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+      - SPRING_DATA_MONGODB_URI=${SPRING_DATA_MONGODB_URI}
+      - REPORT_PATH=${REPORT_PATH}
+      - LOG_PATH=${LOG_PATH}
+    networks:
+      - sausage_network
+    deploy:
+      replicas: 0
+    ports:
+      - "8082:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8080/actuator/health | grep -q '\"status\":\"UP\"'"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 30s
+
+networks:
+  sausage_network:
+    external: true
